@@ -1,22 +1,64 @@
 language: python
-python:
-  - "3.7"
-before_install:
-  - sudo apt-get update
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
+
+matrix:
+  include:
+    - python: "3.7"
+      os: linux
+      env: PYENV=3.7 VERSION=0.0.1 PKG_NAME=monte_carlo_gsa
+    - python: "3.8"
+      os: linux
+      env: PYENV=3.8 VERSION=0.0.1 PKG_NAME=monte_carlo_gsa
+    - python: "3.7"
+      language: generic
+      os: osx
+      env: PYENV=3.7 VERSION=0.0.1 PKG_NAME=monte_carlo_gsa
+    - python: "3.8"
+      language: generic
+      os: osx
+      env: PYENV=3.8 VERSION=0.0.1 PKG_NAME=monte_carlo_gsa
+
+install:
+  # As suggested by https://github.com/conda/conda/issues/9337#issuecomment-542466141
+  - wget https://repo.anaconda.com/pkgs/misc/conda-execs/conda-latest-$TRAVIS_OS_NAME-64.exe -O conda.exe
+  - chmod +x conda.exe
+  - export CONDA_ALWAYS_YES=1
+  - ./conda.exe create -p $HOME/miniconda -c conda-forge python=$PYENV conda conda-build coveralls coverage
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
+  # Useful for debugging any issues with conda
   - conda info -a
-#  - conda create -q -n test-environment python=3.7
-#  - source activate test-environment
-#  - conda install -q -c conda-forge -c cmutel -c haasad brightway2 numpy pandas salib
-#  - echo $(python --version)
-#  - pip install pytest pytest-cov python-coveralls
-install: "python setup.py"
+
+  # Build source into local package for testing
+  - conda build ./ci/travis/recipe --no-test
+  - conda install -q -c conda-forge -c cmutel -c file://$HOME/miniconda/conda-bld/ monte_carlo_gsa==$VERSION;
+
+
 script:
+  # Run code coverage of the source code using all of the tests.
   - pwd;
-after_success:
-  - coveralls
+
+
+# https://docs.travis-ci.com/user/deployment/script/
+# https://docs.travis-ci.com/user/deployment/#pull-requests
+# Move deploy code from 'after_success' to 'deploy'
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: bash ci/conda_upload.sh;
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script: bash ci/conda_upload.sh;
+    on:
+      all_branches: true
+      tags: true
+
+# Shouldn't need to have a lot of commit-history within the test
+git:
+  depth: 3
+
+notifications:
+  email:
+    on_success: always # default: change
+    on_failure: always # default: always
