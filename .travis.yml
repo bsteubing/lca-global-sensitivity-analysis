@@ -30,7 +30,7 @@ install:
 
   # Build source into local package for testing
   - conda build ./ci/travis/recipe --no-test
-  - conda install -q -c conda-forge -c cmutel -c file://$HOME/miniconda/conda-bld/ monte_carlo_gsa==$VERSION;
+  - conda install -q -c conda-forge -c cmutel -c haasad -c file://$HOME/miniconda/conda-bld/ monte_carlo_gsa==$VERSION;
 
 
 script:
