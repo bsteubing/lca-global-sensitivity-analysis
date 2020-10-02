@@ -296,7 +296,6 @@ class GlobalSensitivityAnalysis(object):
 
         except Exception as e:
             traceback.print_exc()
-            # todo: QMessageBox.warning(self, 'Could not perform Delta analysis', str(e))
             print('Initializing the GSA failed.')
             return None
 
@@ -335,7 +334,8 @@ class GlobalSensitivityAnalysis(object):
                 dfs.append(self.dfcf)
 
         # parameters
-        # todo: if parameters, include df, but remove exchanges from T and B (skipped for now)
+        # remark: the exchanges affected by parameters are NOT removed in this implementation. Thus the GSA results
+        # will potentially show both the parameters AND the dependent exchanges
         self.dfp = get_parameters_DF(self.mc)  # Empty df if no parameters
         if not self.dfp.empty:
             dfs.append(self.dfp)
