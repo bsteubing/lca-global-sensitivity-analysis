@@ -1,0 +1,37 @@
+package:
+  name: "{{ os.environ.get('PKG_NAME', 'monte_carlo_gsa') }}"
+  version: "{{ os.environ.get('VERSION', 'dev') }}"
+
+source:
+  path: ../../..
+
+build:
+  noarch: python
+  number: 0
+  script: "{{ PYTHON }} setup.py install --single-version-externally-managed --record record.txt"
+  script_env:
+    - PKG_NAME
+    - VERSION
+    - CONDA_BLD_PATH
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - python<3.9  # https://github.com/conda-forge/pyside2-feedstock/issues/56
+    - brightway2 >=2.1.2
+    - numpy <1.18  #https://github.com/LCA-ActivityBrowser/activity-browser/issues/427
+    - pandas >=0.24.1
+    - salib
+
+about:
+  home: https://github.com/bsteubing/lca-global-sensitivity-analysis
+  license: LGPL3+
+  license_family: LGPL
+  license_file: LICENSE.txt
+  summary: "{{ os.environ.get('SUMMARY', 'Development version of GSA for LCA') }}"
+  description: |
+    This package implements Global Sensitivity Analysis (GSA) for Life Cycle Assessment (LCA). At this stage, it uses the Delta
+    Moment-Independent measure (provided by [SALIB](https://salib.readthedocs.io/en/latest/api.html#delta-moment-independent-measure)
+    based on Monte Carlo LCA results obtained using [Brightway2](https://brightway.dev).
