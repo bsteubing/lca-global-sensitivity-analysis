@@ -12,7 +12,7 @@ Due to the complexity of the brightway parameters package, we were not able to i
 Parameter uncertainties can, however, be included in the implementation of this GSA approach using the [Activity Browser](https://github.com/LCA-ActivityBrowser/activity-browser).
 
 ## Scientific paper
-A scientific paper is in preparation and will be listed here once published. 
+A scientific paper is in preparation and will soon be listed here. 
 
 # Installation
 
